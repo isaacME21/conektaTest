@@ -11,9 +11,11 @@ class LoginViewController: UIViewController {
     
     @IBOutlet weak var emailTextField : UITextField!
     @IBOutlet weak var passwordTextField : UITextField!
+    @IBOutlet weak var loginCardView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        loginCardView.layer.cornerRadius = 10
         hideKeyboard()
     }
     
@@ -28,7 +30,6 @@ class LoginViewController: UIViewController {
             alerts(type: 0)
             return
         }
-        
         if !email.isEmpty && !password.isEmpty{
             if !email.isValidEmail(){
                 alerts(type: 2)
@@ -37,8 +38,8 @@ class LoginViewController: UIViewController {
                alerts(type: 3)
             }
             if email == "test@conekta.com" && password == "Abcd12345@"{
-                let cardsVC = self.storyboard?.instantiateViewController(withIdentifier: "CardsViewController") as! CardsViewController
-                navigationController?.pushViewController(cardsVC, animated: true)
+                let postVC = self.storyboard?.instantiateViewController(withIdentifier: "PostsViewController") as! PostsViewController
+                navigationController?.pushViewController(postVC, animated: true)
             }else{
                 alerts(type: 4)
             }

@@ -6,19 +6,43 @@
 //
 
 import Foundation
+import SwiftyJSON
+
+enum HttpMethod : String{
+    case post = "POST"
+}
+
+struct Resource <T: Codable> {
+    let url : URL
+    var httpMethod : HttpMethod = .post
+    var body : Data? = nil
+    
+    init(url: URL){
+        self.url = url
+    }
+    
+}
 
 class WebService{
     
-    func getPosts(url: URL, completion: @escaping ([Post]?) -> ()){
+    func getPosts<T>(resource : Resource<T>, completion: @escaping ([Post]?) -> ()){
+        var request = URLRequest(url: resource.url)
+        request.httpMethod = resource.httpMethod.rawValue
+        request.httpBody = resource.body
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error{
                 print(error.localizedDescription)
                 completion(nil)
             }else if let data = data{
                 do{
-                    let postsList = try JSONDecoder().decode(Posts.self, from: data)
-                    completion(postsList.posts)
+                    let json = try JSON(data: data)
+                    var postList : [Post] = []
+                    postList.append(try JSONDecoder().decode(Post.self, from: json["0"].rawData()))
+                    postList.append(try JSONDecoder().decode(Post.self, from: json["1"].rawData()))
+                    postList.append(try JSONDecoder().decode(Post.self, from: json["2"].rawData()))
+                    completion(postList)
                 }catch{
                     print(error.localizedDescription)
                     completion(nil)
